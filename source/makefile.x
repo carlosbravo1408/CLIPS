@@ -4,8 +4,8 @@
 # that xclips color are made.
 # -----------------------------------------------------
 
-WHERE_XLIBS_ARE =       /usr/X11R6/lib
-WHERE_INCL_FILES_ARE =  /usr/X11R6/include
+WHERE_XLIBS_ARE =       /usr/lib/x86_64-linux-gnu
+WHERE_INCL_FILES_ARE =  /usr/include
 
 #--------------------------------------------------------------------
 #  Please! do not have -O on because there is an unresolved bug either
@@ -49,13 +49,13 @@ OBJS = agenda.o analysis.o argacces.o bload.o bmathfun.o bsave.o \
 	xmenu_file.o xmenu_opt.o xmenu_watch.o xmenu_wind.o
 
 .c.o :
-	gcc -c -Wall -Wundef $(INCLUDES) -Wpointer-arith -Wshadow \
+	gcc -c -fcommon -Wall -Wundef $(INCLUDES) -Wpointer-arith -Wshadow \
 	    -Wcast-align -Winline -Wmissing-declarations -Wredundant-decls \
 	    -Wmissing-prototypes -Wnested-externs \
 	    -Wstrict-prototypes -Waggregate-return -Wno-implicit $<
 
 xclips : $(OBJS)
-	gcc -o xclips $(OBJS) $(LDFLAGS) $(LIBS)   
+	gcc -o xclips $(OBJS) $(LDFLAGS) $(LIBS)
 
 agenda.o: agenda.c setup.h envrnmnt.h usrsetup.h argacces.h expressn.h \
   exprnops.h exprnpsr.h extnfunc.h symbol.h userdata.h scanner.h pprint.h \

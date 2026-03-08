@@ -1,3 +1,6 @@
+# The GNU Make Manual
+# http://www.gnu.org/software/make/manual/make.html
+
 OBJS = agenda.o analysis.o argacces.o bload.o bmathfun.o bsave.o \
  	classcom.o classexm.o classfun.o classinf.o classini.o \
  	classpsr.o clsltpsr.o commline.o conscomp.o constrct.o \
@@ -15,7 +18,7 @@ OBJS = agenda.o analysis.o argacces.o bload.o bmathfun.o bsave.o \
  	genrcpsr.o globlbin.o globlbsc.o globlcmp.o globlcom.o \
  	globldef.o globlpsr.o immthpsr.o incrrset.o inherpsr.o \
  	inscom.o insfile.o insfun.o insmngr.o insmoddp.o insmult.o \
- 	inspsr.o insquery.o insqypsr.o iofun.o lgcldpnd.o main.o \
+ 	inspsr.o insquery.o insqypsr.o iofun.o lgcldpnd.o \
  	memalloc.o miscfun.o modulbin.o modulbsc.o modulcmp.o moduldef.o \
  	modulpsr.o modulutl.o msgcom.o msgfun.o msgpass.o msgpsr.o \
  	multifld.o multifun.o objbin.o objcmp.o objrtbin.o objrtbld.o \
@@ -34,9 +37,17 @@ OBJS = agenda.o analysis.o argacces.o bload.o bmathfun.o bsave.o \
 	    -Wmissing-prototypes -Wnested-externs \
 	    -Wstrict-prototypes -Waggregate-return -Wno-implicit $<
 
-clips : $(OBJS)
-	gcc -static -o clips $(OBJS) -lm -ltermcap   
+# Creating Unix Libraries
+# http://www.cs.duke.edu/~ola/courses/programming/libraries.html
 
+# Compiling CLIPS using the library
+# gcc -o clips main.c -L. -lm -ltermcap -lclips
+
+libclips.a : $(OBJS)
+	rm -f $@   
+	ar cq $@ $(OBJS)   
+
+# man gcc
 # Dependencies generated using "gcc -MM *.c"
 
 agenda.o: agenda.c setup.h envrnmnt.h usrsetup.h argacces.h expressn.h \
@@ -774,10 +785,6 @@ lgcldpnd.o: lgcldpnd.c setup.h envrnmnt.h usrsetup.h memalloc.h router.h \
   match.h network.h ruledef.h constrnt.h cstrccom.h agenda.h pattern.h \
   reorder.h retract.h reteutil.h argacces.h factmngr.h facthsh.h \
   multifld.h tmpltdef.h factbld.h insfun.h object.h
-
-main.o: main.c setup.h envrnmnt.h usrsetup.h sysdep.h extnfunc.h symbol.h \
-  expressn.h exprnops.h exprnpsr.h scanner.h pprint.h userdata.h \
-  commline.h
 
 memalloc.o: memalloc.c setup.h envrnmnt.h usrsetup.h constant.h \
   memalloc.h router.h prntutil.h moduldef.h conscomp.h constrct.h \
