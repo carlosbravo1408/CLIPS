@@ -28,6 +28,9 @@ void CreatePullDownMenus(Widget);
 void CancelPopupSelect(Widget,XtPointer,XtPointer);
 void PopdownSelect(Widget,XtPointer,XtPointer);
 void MenuFunc(Widget,XtPointer,XtPointer);
+void CloseChildWindowHandler(Widget, XtPointer, XEvent *, Boolean *);
+void CloseWidget(Widget);
+void RegisterPersistentClose(Widget, Widget, XtCallbackProc);
 
 #ifndef _XMENU_SOURCE_
    extern Widget                   defrule_manager;

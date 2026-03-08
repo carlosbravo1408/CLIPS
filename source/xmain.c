@@ -57,6 +57,65 @@
 #include "xmenu.h"
 #include "xclips.h"
 
+
+void CloseAppHandler(Widget w, XtPointer client_data, XEvent *event, Boolean *continue_to_dispatch) {
+    if (event->type == ClientMessage) {
+        Atom wm_delete_window = XInternAtom(XtDisplay(w), "WM_DELETE_WINDOW", False);
+        if ((Atom)event->xclient.data.l[0] == wm_delete_window) {
+            exit(0);
+        }
+    }
+}
+
+void CloseChildWindowHandler(Widget w, XtPointer client_data, XEvent *event, Boolean *continue_to_dispatch) {
+    if (event->type == ClientMessage) {
+        Atom wm_delete_window = XInternAtom(XtDisplay(w), "WM_DELETE_WINDOW", False);
+        if ((Atom)event->xclient.data.l[0] == wm_delete_window) {
+            XtDestroyWidget(w);
+        }
+    }
+}
+
+void CloseWidget(Widget w){
+    XtRealizeWidget(w);
+    Atom wm_delete = XInternAtom(XtDisplay(w), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete, 1);
+    XtAddEventHandler(w, NoEventMask, True, (XtEventHandler)CloseChildWindowHandler, NULL);
+}
+
+typedef struct {
+    Widget menu_widget;
+    XtCallbackProc callback_func;
+} PersistentWindowData;
+
+void PersistentWindowCloseHandler(Widget w, XtPointer client_data, XEvent *event, Boolean *continue_to_dispatch) {
+    if (event->type == ClientMessage) {
+        Atom wm_delete_window = XInternAtom(XtDisplay(w), "WM_DELETE_WINDOW", False);
+        if ((Atom)event->xclient.data.l[0] == wm_delete_window) {
+            PersistentWindowData *data = (PersistentWindowData *)client_data;
+
+            *continue_to_dispatch = False;
+
+            if (data->callback_func != NULL && data->menu_widget != NULL) {
+                data->callback_func(w, (XtPointer)data->menu_widget, NULL);
+            }
+        }
+    }
+}
+void RegisterPersistentClose(Widget w, Widget menu_widget, XtCallbackProc callback_func) {
+    XtRealizeWidget(w);
+    Atom wm_delete = XInternAtom(XtDisplay(w), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete, 1);
+
+    PersistentWindowData *data = (PersistentWindowData *)malloc(sizeof(PersistentWindowData));
+    data->menu_widget = menu_widget;
+    data->callback_func = callback_func;
+
+    XtInsertEventHandler(w, NoEventMask, True,
+                         (XtEventHandler)PersistentWindowCloseHandler,
+                         (XtPointer)data, XtListHead);
+}
+
 Boolean Dribble_status;
                                      
 Boolean Browse_status[WINDOW_NUM] = {False,False,False,False,False};
@@ -181,9 +240,7 @@ static char clips_logo_bits[] = {
                        argv - arguments
           Returns:     0 on exit
 *******************************************************************************/
-int main(
-  int argc,
-  char **argv)
+int main(int argc, char **argv)
   {
    void *theEnv;
    /*================================*/
@@ -266,6 +323,10 @@ int main(
    XtRealizeWidget(toplevel); 
 
    theEnv = CreateEnvironment();
+
+    Atom wm_delete_window = XInternAtom(XtDisplay(toplevel), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(XtDisplay(toplevel), XtWindow(toplevel), &wm_delete_window, 1);
+    XtAddEventHandler(toplevel, NoEventMask, True, (XtEventHandler)CloseAppHandler, NULL);
 
    InitializeInterface();
    RerouteStdin(theEnv,argc,argv);
