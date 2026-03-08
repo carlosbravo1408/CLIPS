@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=XCLIPS
+Comment=XClIPS for CLIPS V6.24 (Windowed Version)
+Exec=xclips
+Icon=clipslogo
+Terminal=false
+Categories=Development;Science;

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=CLIPS
+Comment=CLIPS V6.24 (Terminal Version)
+Icon=clipslogo
+Exec=clips
+Terminal=true
+Categories=Development;Science;

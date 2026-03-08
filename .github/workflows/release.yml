@@ -1,0 +1,51 @@
+name: Ubuntu 20.04 Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxaw7-dev libxmu-dev libxt-dev libxext-dev libx11-dev
+
+      - name: Compile CLIPS (Terminal)
+        run: |
+          rm -f *.o
+          make -f makefile.gcc
+          mkdir -p AppDir_CLIPS/usr/bin
+          cp clips AppDir_CLIPS/usr/bin/
+
+      - name: Compile XCLIPS (GUI)
+        run: |
+          rm -f *.o
+          make -f makefile.x
+          mkdir -p AppDir_XCLIPS/usr/bin
+          cp xclips AppDir_XCLIPS/usr/bin/
+
+      - name: Build AppImage
+        env:
+          OUTPUT: CLIPS-x86_64.AppImage
+        run: |
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          
+          env OUTPUT=CLIPS-x86_64.AppImage ./linuxdeploy-x86_64.AppImage --appdir AppDir_CLIPS -d ./desktops/CLIPS.desktop -i ./img/clipslogo.png --output appimage
+          
+          env OUTPUT=XCLIPS-x86_64.AppImage ./linuxdeploy-x86_64.AppImage --appdir AppDir_XCLIPS -d ./desktops/XCLIPS.desktop -i ./img/clipslogo.png --output appimage
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            xclips
+            clips
+            *.AppImage
