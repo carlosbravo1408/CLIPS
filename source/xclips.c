@@ -125,7 +125,7 @@ void InitializeInterface()
       EnvExitRouter(theEnv,0);
      }
      
-   EnvPrintRouter(theEnv,"wclips", "                  XCLIPS for:");
+   EnvPrintRouter(theEnv,"wclips", "XCLIPS for:");
   }
 
 /*******************************************************************************
