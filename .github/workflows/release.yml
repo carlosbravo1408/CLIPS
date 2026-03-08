@@ -32,8 +32,6 @@ jobs:
           cp xclips AppDir_XCLIPS/usr/bin/
 
       - name: Build AppImage
-        env:
-          OUTPUT: CLIPS-x86_64.AppImage
         run: |
           wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           chmod +x linuxdeploy-x86_64.AppImage
