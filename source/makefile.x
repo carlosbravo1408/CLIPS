@@ -12,9 +12,10 @@ WHERE_INCL_FILES_ARE =  /usr/include
 #  in the interface code or the optimizer that cause xclips to crash
 #--------------------------------------------------------------------
 
-LDFLAGS = -L$(WHERE_XLIBS_ARE)
+#LDFLAGS = -L$(WHERE_XLIBS_ARE)
+#LIBS = -lXaw -lXmu -lXt -lXext -lX11 -lm
 INCLUDES = -I$(WHERE_INCL_FILES_ARE)
-LIBS = -lXaw -lXmu -lXt -lXext -lX11 -lm
+LIBS = -L/usr/contrib/X11R6/lib -lXaw -lXmu -lXt -lXext -lX11 -lm
 
 OBJS = agenda.o analysis.o argacces.o bload.o bmathfun.o bsave.o \
  	classcom.o classexm.o classfun.o classinf.o classini.o \
@@ -49,13 +50,13 @@ OBJS = agenda.o analysis.o argacces.o bload.o bmathfun.o bsave.o \
 	xmenu_file.o xmenu_opt.o xmenu_watch.o xmenu_wind.o
 
 .c.o :
-	gcc -c -fcommon -Wall -Wundef $(INCLUDES) -Wpointer-arith -Wshadow \
+	gcc -c -fcommon -Wall -DWINDOW_INTERFACE=1 -Wundef $(INCLUDES) -Wpointer-arith -Wshadow \
 	    -Wcast-align -Winline -Wmissing-declarations -Wredundant-decls \
 	    -Wmissing-prototypes -Wnested-externs \
 	    -Wstrict-prototypes -Waggregate-return -Wno-implicit $<
 
 xclips : $(OBJS)
-	gcc -o xclips $(OBJS) $(LDFLAGS) $(LIBS)
+	gcc -o xclips $(OBJS) $(LIBS)
 
 agenda.o: agenda.c setup.h envrnmnt.h usrsetup.h argacces.h expressn.h \
   exprnops.h exprnpsr.h extnfunc.h symbol.h userdata.h scanner.h pprint.h \
