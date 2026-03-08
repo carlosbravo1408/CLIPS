@@ -74,7 +74,7 @@
 #endif
 
 #ifndef BANNER_STRING
-#define BANNER_STRING "         CLIPS (V6.24 06/15/06)\n"
+#define BANNER_STRING "         CLIPS (V6.24 06/15/06) - Built by Carlos B. for VIU-MIAR\n"
 #endif
 
 /*************************/

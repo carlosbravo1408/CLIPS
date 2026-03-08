@@ -79,6 +79,8 @@ String about_info[] =
   "",
   "     CLIPS:   Gary Riley & Brian Donnell  ",
   "",
+  "Built for Linux By:",
+  "              Carlos J. Bravo I.",
   NULL,
   };
 
@@ -550,6 +552,7 @@ static void AboutXCLIPS(
                 (XtPointer)about_form);
 
    XtPopup(about, XtGrabNone);
+  CloseWidget(about);
   }
 
 /*******************************************************************************
@@ -606,6 +609,7 @@ void MenuFunc(
       case EDIT:
         XtDestroyWidget(popup);
         EditNewFile(w, client_data, call_data);
+        CloseWidget(popup);
         break;
 
       case LOADBATCH:
