@@ -310,6 +310,7 @@ void OptionsWindow(
                                        optionsForm,
                                         TheArgs, n);
     XtAddCallback(Okay,XtNcallback,OkayOptionsCallback,(XtPointer)NULL);
+    RegisterPersistentClose(optionsShell, optionsForm, PopdownSelect);
     XtPopup(optionsShell,XtGrabNonexclusive);
   }
 

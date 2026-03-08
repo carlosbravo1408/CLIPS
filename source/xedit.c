@@ -419,6 +419,7 @@ void EditNewFile(
   XtAddCallback(item, XtNcallback, EditorHelpSelect, (XtPointer)edit_text);
 
   XtPopup(edit, XtGrabNone);
+  CloseWidget(edit);
   }
 
 /*******************************************************************************
@@ -453,6 +454,9 @@ void EditorSaveCallback(
   XawDialogAddButton(confirm, "Cancel", CancelPopupSelect, (XtPointer)confirm);
 
   XtPopup(popup, XtGrabNonexclusive);
+
+  CloseWidget(popup);
+  //CloseWidget(confirm);
   }
 
 /*******************************************************************************
@@ -490,6 +494,9 @@ void EditorSaveAsCallback(
                      (XtPointer)file_dialog);
 
   XtPopup(popup, XtGrabNonexclusive);
+
+  CloseWidget(popup);
+  //CloseWidget(file_dialog);
   }
 
 /*******************************************************************************
@@ -528,6 +535,8 @@ void EditorRevertCallback(
   XawDialogAddButton(confirm, "Cancel", CancelPopupSelect, (XtPointer)confirm);
 
   XtPopup(popup, XtGrabNonexclusive);
+  CloseWidget(popup);
+  //CloseWidget(confirm);
   }
 
 /* ================================================ */
@@ -798,6 +807,9 @@ void EditorExitCallback(
     XawDialogAddButton(confirm, "Save First", EditorSaveFirst, client_data);
 
   XtPopup(popup, XtGrabNonexclusive);
+
+  CloseWidget(popup);
+  //CloseWidget(confirm);
   }
 
 /*******************************************************************************
@@ -922,6 +934,7 @@ void FindMatchingParenthesisCallback(
            WarningWindow("There is no\nmatching parenthesis!");
          }
       }
+  //CloseWidget(source);
   }
 
 /*******************************************************************************
@@ -979,6 +992,9 @@ char *text)
                                   TheArgs, 1);
    XawDialogAddButton( WarningDialog,"Okay",CancelPopupSelect,(XtPointer)WarningDialog);
    XtPopup(WarningShell, XtGrabNonexclusive);
+
+  CloseWidget(WarningShell);
+  //CloseWidget(WarningDialog);
 
 }
 /*******************************************************************************
@@ -1070,7 +1086,9 @@ static void EditorFontSelect(
     XtSetArg(args[0], XtNfont, font);
     XtSetValues(edit_text, args, 1);
     }
+  //CloseWidget(edit_text);
   }
+
 
 /*******************************************************************************
           Name:        EditorHelpSelect
@@ -1114,6 +1132,9 @@ void EditorHelpSelect(
                 (XtPointer)help_form);
 
   XtPopup(help, XtGrabNone);
+  CloseWidget(help);
+  //CloseWidget(help_form);
+  //CloseWidget(help_list);
   }
 
 /*******************************************************************************
@@ -1159,6 +1180,7 @@ void EditorSaveAs(
     }
 
   XtDestroyWidget(XtParent(XtParent(w)));
+  CloseWidget(edit_text);
   }
 
 /*******************************************************************************

@@ -247,6 +247,7 @@ void ModuleCallback(
                                  TheArgs,2);
    XtAddCallback(done,XtNcallback,DoneSelectDefmoduleCallback,moduleList);
    XtPopup(defmoduleShell, XtGrabNonexclusive);
+  CloseWidget(defmoduleShell);
   }
 
 /****************************************************************************
@@ -535,6 +536,7 @@ void DefruleManagerCallback(
 
   XtAddCallback(manager_list,XtNcallback,DefruleMngrCheckboxesCallback,CheckBoxes);
   XtPopup(defrulemanager, XtGrabNonexclusive);
+  CloseWidget(defrulemanager);
 
   }
 
@@ -634,6 +636,7 @@ void DeffactManagerCallback(
   XtAddCallback(cancel, XtNcallback, CancelSelectPrimary, deffactsmanager);
 
   XtPopup(deffactsmanager, XtGrabNonexclusive);
+  CloseWidget(deffactsmanager);
  
   }
 
@@ -757,6 +760,7 @@ void DeftemplateManagerCallback(
   XtAddCallback(cancel,XtNcallback,CancelSelectPrimary, deftemplatemanager);
 
   XtPopup(deftemplatemanager, XtGrabNonexclusive);
+  CloseWidget(deftemplatemanager);
   }
 
 /*******************************************************************************
@@ -879,6 +883,7 @@ void DeffunctionManagerCallback(
                 (XtPointer)deffunctionmanager);
 
   XtPopup(deffunctionmanager, XtGrabNonexclusive);
+  CloseWidget(deffunctionmanager);
   }
 
 /*******************************************************************************
@@ -978,7 +983,7 @@ void DefglobalManagerCallback(
                 (XtPointer)defglobalmanager);
 
   XtPopup(defglobalmanager, XtGrabNonexclusive);
-
+  CloseWidget(defglobalmanager);
 
   }
 
@@ -1214,6 +1219,7 @@ void DefgenericManagerCallback(
   XtAddCallback(cancel, XtNcallback, CancelSelectPrimary,(XtPointer)defgenericmanager);
 
   XtPopup(defgenericmanager, XtGrabNonexclusive);
+  CloseWidget(defgenericmanager);
   }
 
 
@@ -1316,6 +1322,7 @@ void DefinstancesManagerCallback(
                 (XtPointer)definstancesmanager);
 
   XtPopup(definstancesmanager, XtGrabNonexclusive);
+  CloseWidget(definstancesmanager);
   }
 
 /*******************************************************************************
@@ -1513,6 +1520,7 @@ void DefclassManagerCallback(
   XtAddCallback(manager_list,XtNcallback,DefclssMngrChckbxCallback,(XtPointer)CheckBoxes);
 
   XtPopup(defclassmanager, XtGrabNonexclusive);
+  CloseWidget(defclassmanager);
   }
 
 
@@ -1612,6 +1620,7 @@ void AgendaManagerCallback(
   XtAddCallback(cancel, XtNcallback, CancelSelectPrimary, (XtPointer) agendamanager);
 
   XtPopup(agendamanager,  XtGrabNonexclusive);
+  CloseWidget(agendamanager);
   }
 
 /*******************************************************************************
@@ -1734,36 +1743,30 @@ static void AgendaFire(
                        call_data - not used
           Returns:     None
 *******************************************************************************/
-void FactsWindowCallback(
-  Widget w,
-  XtPointer client_data, 
-  XtPointer call_data)
-  {
-   void *theEnv = GetCurrentEnvironment();
-   
-   if (Browse_status[FACT_WIN])
-     {
-      XtSetArg(TheArgs[0], XtNleftBitmap, None);
-      XtPopdown(facts);
-      }
-    else if (facts_text != NULL)
-      {
-       XtPopup(facts,XtGrabNone);
-       EnvSetFactListChanged(theEnv,FALSE);
-       PrintChangedFacts();
-       XtSetArg(TheArgs[0], XtNleftBitmap, checker);
-      }
-    else
-      {
-       CreateFactWindow();
-       EnvSetFactListChanged(theEnv,FALSE);
-       PrintChangedFacts();
-       XtSetArg(TheArgs[0], XtNleftBitmap, checker);
-      }
-
-   XtSetValues(facts_window, TheArgs, 1);
-   Browse_status[FACT_WIN] = !Browse_status[FACT_WIN];
+void FactsWindowCallback(Widget w, XtPointer client_data, XtPointer call_data) {
+  void *theEnv = GetCurrentEnvironment();
+  if (Browse_status[FACT_WIN]) {
+    XtSetArg(TheArgs[0], XtNleftBitmap, None);
+    XtPopdown(facts);
+    Browse_status[FACT_WIN] = 0;
   }
+  else {
+    if (facts_text != NULL)
+    {
+      XtPopup(facts,XtGrabNone);
+    }
+    else
+    {
+      CreateFactWindow();
+      RegisterPersistentClose(facts, facts_window, FactsWindowCallback);
+    }
+    EnvSetFactListChanged(theEnv,FALSE);
+    PrintChangedFacts();
+    XtSetArg(TheArgs[0], XtNleftBitmap, checker);
+    Browse_status[FACT_WIN] = 1;
+  }
+  XtSetValues(facts_window, TheArgs, 1);
+}
 
 /**********************************************************************
  *    CreateFactWindow
@@ -1847,28 +1850,28 @@ void AgendaWindowCallback(
   {
    void *theEnv = GetCurrentEnvironment();
    
-   if (Browse_status[AGENDA_WIN])
-     {
-      XtSetArg(TheArgs[0], XtNleftBitmap, None);
-      XtPopdown(agenda);
+   if (Browse_status[AGENDA_WIN]) {
+     XtSetArg(TheArgs[0], XtNleftBitmap, None);
+     XtPopdown(agenda);
+     Browse_status[AGENDA_WIN] = 0;
      }
-   else if(agenda != NULL)
+   else {
+     if(agenda != NULL)
      {
-      XtPopup(agenda,XtGrabNone);
-      EnvSetAgendaChanged(theEnv,FALSE);
-      PrintChangedAgenda();
-      XtSetArg(TheArgs[0], XtNleftBitmap,checker);
+       XtPopup(agenda,XtGrabNone);
      }
-   else
+     else
      {
-      CreateAgendaWindow();
-      EnvSetAgendaChanged(theEnv,FALSE);
-      PrintChangedAgenda();
-      XtSetArg(TheArgs[0], XtNleftBitmap, checker);
+       CreateAgendaWindow();
+       RegisterPersistentClose(agenda, agenda_window, AgendaWindowCallback);
      }
+     EnvSetAgendaChanged(theEnv,FALSE);
+     PrintChangedAgenda();
+     XtSetArg(TheArgs[0], XtNleftBitmap,checker);
+     Browse_status[AGENDA_WIN] = 1;
+   }
 
    XtSetValues(agenda_window, TheArgs, 1);
-   Browse_status[AGENDA_WIN] = !Browse_status[AGENDA_WIN];
   }
   
 /*******************************************************************************
@@ -1942,28 +1945,29 @@ void FocusWindowCallback(
   {
    void *theEnv = GetCurrentEnvironment();
    
-   if (Browse_status[FOCUS_WIN])
+   if (Browse_status[FOCUS_WIN]) {
+     XtSetArg(TheArgs[0], XtNleftBitmap, None);
+     XtPopdown(focus);
+     Browse_status[FOCUS_WIN] = 0;
+   }
+   else {
+     if (focus != NULL)
      {
-      XtSetArg(TheArgs[0], XtNleftBitmap, None);
-      XtPopdown(focus);
+       XtPopup(focus,XtGrabNone);
      }
-   else if (focus != NULL)
+     else
      {
-      XtPopup(focus,XtGrabNone);
-      EnvSetFocusChanged(theEnv,FALSE);
-      PrintChangedFocus();
-      XtSetArg(TheArgs[0], XtNleftBitmap,checker);
+       CreateFocusWindow();
+       RegisterPersistentClose(focus, focus_window, FocusWindowCallback);
      }
-   else
-     {
-      CreateFocusWindow();
-      EnvSetFocusChanged(theEnv,FALSE);
-      PrintChangedFocus();
-      XtSetArg(TheArgs[0], XtNleftBitmap, checker);
-     }
+     EnvSetFocusChanged(theEnv,FALSE);
+     PrintChangedFocus();
+     XtSetArg(TheArgs[0], XtNleftBitmap,checker);
+     Browse_status[FOCUS_WIN] = 1;
+   }
    
    XtSetValues(focus_window, TheArgs, 1);
-   Browse_status[FOCUS_WIN] = !Browse_status[FOCUS_WIN];
+
   }
 
 /*******************************************************************************
@@ -2019,36 +2023,31 @@ void CreateFocusWindow()
           Arguments: 
           Returns:     None
 *******************************************************************************/
-void InstancesWindowCallback(
-  Widget w,
-  XtPointer client_data, 
-  XtPointer call_data)
-  {
-   void *theEnv = GetCurrentEnvironment();
+void InstancesWindowCallback(Widget w, XtPointer client_data, XtPointer call_data) {
+  void *theEnv = GetCurrentEnvironment();
    
-   if (Browse_status[INSTANCE_WIN])
-     {
-      XtSetArg(TheArgs[0], XtNleftBitmap, None);
-      XtPopdown(instances);
-     }
-   else if (instances != NULL)
-     {
-      XtPopup(instances,XtGrabNone);
-      EnvSetInstancesChanged(theEnv,FALSE);
-      PrintChangedInstances();
-      XtSetArg(TheArgs[0], XtNleftBitmap,checker);
-     }
-   else
-     {
-      CreateInstanceWindow();
-      EnvSetInstancesChanged(theEnv,FALSE);
-      PrintChangedInstances();
-      XtSetArg(TheArgs[0], XtNleftBitmap, checker);
-     }
-     
-   XtSetValues(instances_window, TheArgs, 1);
-   Browse_status[INSTANCE_WIN] = !Browse_status[INSTANCE_WIN];
+  if (Browse_status[INSTANCE_WIN]) {
+    XtSetArg(TheArgs[0], XtNleftBitmap, None);
+    XtPopdown(instances);
+    Browse_status[INSTANCE_WIN]=0;
   }
+  else {
+    if (instances != NULL)
+    {
+      XtPopup(instances,XtGrabNone);
+    }
+    else
+    {
+      CreateInstanceWindow();
+      RegisterPersistentClose(instances, instances_window, InstancesWindowCallback);
+    }
+    EnvSetInstancesChanged(theEnv,FALSE);
+    PrintChangedInstances();
+    XtSetArg(TheArgs[0], XtNleftBitmap,checker);
+    Browse_status[INSTANCE_WIN]=1;
+  }
+  XtSetValues(instances_window, TheArgs, 1);
+}
 
 /**********************************************************************************
  *    CreateInstanceWindow
@@ -2103,7 +2102,7 @@ void CreateInstanceWindow()
                            XtParseTranslationTable(xclips_translation2));
 
     XtPopup(instances, XtGrabNone);
-  
+
    if (! EnvAddRouter(theEnv,"xinstances", 10, XclipsQuery, XclipsPrint, NULL, NULL, XclipsExit))
      {
       EnvPrintRouter(theEnv,"werror", "Could not allocate xinstances router!\n");
@@ -2120,36 +2119,32 @@ void CreateInstanceWindow()
                        call_data - not used
           Returns:     None
 *******************************************************************************/
-void GlobalsWindowCallback(
-  Widget w,
-  XtPointer client_data, 
-  XtPointer call_data)
-  {
-   void *theEnv = GetCurrentEnvironment();
+void GlobalsWindowCallback(Widget w, XtPointer client_data, XtPointer call_data) {
+  void *theEnv = GetCurrentEnvironment();
    
-  if (Browse_status[GLOBAL_WIN])
-    {
+  if (Browse_status[GLOBAL_WIN]) {
     XtPopdown(globals);
     XtSetArg(TheArgs[0], XtNleftBitmap, None);
-    }
-  else if(globals != NULL)
-   {
-     XtPopup(globals,XtGrabNone);
-     EnvSetGlobalsChanged(theEnv,FALSE);
-     PrintChangedGlobals();
-     XtSetArg(TheArgs[0], XtNleftBitmap,checker);
-   }
-  else
+    Browse_status[GLOBAL_WIN] = 0;
+  }
+  else {
+    if(globals != NULL)
     {
-     CreateGlobalWindow();
-     EnvSetGlobalsChanged(theEnv,FALSE);
-     PrintChangedGlobals();
-     XtSetArg(TheArgs[0], XtNleftBitmap, checker);
+      XtPopup(globals,XtGrabNone);
     }
+    else
+    {
+      CreateGlobalWindow();
+      RegisterPersistentClose(globals, globals_window, GlobalsWindowCallback);
+    }
+      EnvSetGlobalsChanged(theEnv,FALSE);
+      PrintChangedGlobals();
+      XtSetArg(TheArgs[0], XtNleftBitmap, checker);
+    Browse_status[GLOBAL_WIN] = 1;
+  }
 
   XtSetValues(globals_window, TheArgs, 1);
 
-  Browse_status[GLOBAL_WIN] = !Browse_status[GLOBAL_WIN];
 
 }
 /**********************************************************************************
@@ -2234,10 +2229,13 @@ void AllWindowsCallback(
 
     if(!Browse_status[FACT_WIN])
      {
-       if(facts != NULL)
-         XtPopup(facts,XtGrabNone);
-       else
+       if(facts != NULL) {
+           XtPopup(facts,XtGrabNone);
+       }
+       else {
          CreateFactWindow();
+         RegisterPersistentClose(facts, facts_window, FactsWindowCallback);
+       }
        XtSetArg(TheArgs[n],XtNleftBitmap,checker);n++;
        XtSetValues(facts_window,TheArgs,n);       
        Browse_status[FACT_WIN] = !Browse_status[FACT_WIN];
@@ -2249,10 +2247,13 @@ void AllWindowsCallback(
 
     if(!Browse_status[AGENDA_WIN])
      {
-       if(agenda != NULL)
-        XtPopup(agenda,XtGrabNone);
-       else
-        CreateAgendaWindow();
+       if(agenda != NULL) {
+           XtPopup(agenda,XtGrabNone);
+       }
+       else {
+         CreateAgendaWindow();
+         RegisterPersistentClose(agenda, agenda_window, AgendaWindowCallback);
+       }
        XtSetArg(TheArgs[n],XtNleftBitmap,checker);n++;
        XtSetValues(agenda_window,TheArgs,n);
        Browse_status[AGENDA_WIN] = !Browse_status[AGENDA_WIN];
@@ -2265,10 +2266,13 @@ void AllWindowsCallback(
     if(!Browse_status[INSTANCE_WIN])
      {
        
-       if(instances != NULL)
-        XtPopup(instances,XtGrabNone);
-       else
-        CreateInstanceWindow();
+       if(instances != NULL) {
+           XtPopup(instances,XtGrabNone);
+       }
+       else {
+         CreateInstanceWindow();
+         RegisterPersistentClose(instances, instances_window, InstancesWindowCallback);
+       }
        XtSetArg(TheArgs[n],XtNleftBitmap,checker);n++;
        XtSetValues(instances_window,TheArgs,n);
        Browse_status[INSTANCE_WIN] = !Browse_status[INSTANCE_WIN];
@@ -2280,10 +2284,13 @@ void AllWindowsCallback(
 
     if(!Browse_status[GLOBAL_WIN])
      {
-       if(globals != NULL)
-        XtPopup(globals,XtGrabNone);
-       else
-        CreateGlobalWindow();
+       if(globals != NULL) {
+           XtPopup(globals,XtGrabNone);
+       }
+       else {
+         CreateGlobalWindow();
+         RegisterPersistentClose(globals, globals_window, GlobalsWindowCallback);
+       }
        XtSetArg(TheArgs[n],XtNleftBitmap,checker);n++;
        XtSetValues(globals_window,TheArgs,n);
        Browse_status[GLOBAL_WIN]  = !Browse_status[GLOBAL_WIN];
@@ -2295,10 +2302,13 @@ void AllWindowsCallback(
 
     if(!Browse_status[FOCUS_WIN])
     {
-       if(focus != NULL)
-        XtPopup(focus,XtGrabNone);
-       else
-        CreateFocusWindow();
+       if(focus != NULL) {
+           XtPopup(focus,XtGrabNone);
+       }
+       else {
+         CreateFocusWindow();
+         RegisterPersistentClose(focus, focus_window, FocusWindowCallback);
+       }
        XtSetArg(TheArgs[n],XtNleftBitmap,checker);n++;
        XtSetValues(focus_window,TheArgs,n);
        Browse_status[FOCUS_WIN] = !Browse_status[FOCUS_WIN];
@@ -3161,6 +3171,7 @@ static void DefgenericMethodCallback(
                 (XtPointer) defmethodmanager);
 
   XtPopup(defmethodmanager, XtGrabNonexclusive);
+    CloseWidget(defmethodmanager);
 
   }
 
@@ -3758,6 +3769,7 @@ static void DefclassMessageHandlersCallback(
                                  TheArgs, 3);
   XtAddCallback(cancel,XtNcallback,CancelSelectSecondary,defmessHdlrManager);
   XtPopup(defmessHdlrManager, XtGrabNonexclusive);
+    CloseWidget(defmessHdlrManager);
   }
 
 /*******************************************************************************

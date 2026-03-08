@@ -374,7 +374,7 @@ struct symbolMatch *matches)
                      (XtPointer) matchForm);
   XtAddCallback(matchList, XtNcallback, FileToDialog, (XtPointer) matchDialog);
   XtPopup(matchShell,XtGrabNonexclusive);
-  
+  CloseWidget(matchShell);
   return 0;
 }
 
@@ -721,6 +721,7 @@ void QuitCallback(
   XawDialogAddButton(confirm, "Cancel", CancelPopupSelect, (XtPointer) confirm);
 
   XtPopup(confirmshell, XtGrabNonexclusive);
+  CloseWidget(confirmshell);
   }
 
 /*******************************************************************************
@@ -751,6 +752,7 @@ static void ClipsSave()
                      (XtPointer)file_dialog);
 
   XtPopup(popup, XtGrabNonexclusive);
+  CloseWidget(popup);
   }
 
 /*******************************************************************************
@@ -903,6 +905,7 @@ void FileSelect()
   XtAddCallback(file_list, XtNcallback, FileToDialog, (XtPointer) file_dialog);
 
   XtPopup(TheFile, XtGrabNonexclusive);
+  CloseWidget(TheFile);
   /*XDefineCursor(XtDisplay(toplevel),toplevel,None);*/
   }
 
